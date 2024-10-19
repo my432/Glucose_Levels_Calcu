@@ -1,10 +1,14 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 from PIL import Image
+import requests
+from io import BytesIO
 
-# Load a medical-themed image
+# Load a medical-themed image from the internet
 def load_medical_image():
-    return Image.open("medical_background.jpg")  # Replace with your own local image path
+    url = "https://image.shutterstock.com/image-photo/medical-background-with-flat-design-260nw-1213842439.jpg"
+    response = requests.get(url)
+    return Image.open(BytesIO(response.content))
 
 # Function to calculate estimated HbA1c based on average blood glucose level
 def calculate_hba1c(avg_glucose):
@@ -69,7 +73,7 @@ def main():
     st.title("🩸 Blood Glucose & HbA1c Estimator")
     st.subheader("Monitor your blood glucose levels and estimate your HbA1c for a healthier life.")
 
-    # Display medical-themed image (add your own image path)
+    # Display medical-themed image (from an online source)
     image = load_medical_image()
     st.image(image, use_column_width=True, caption="Track your blood glucose for better health.")
 
