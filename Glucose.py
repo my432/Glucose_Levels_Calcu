@@ -1,14 +1,5 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-from PIL import Image
-import requests
-from io import BytesIO
-
-# Load a medical-themed image from the internet
-def load_medical_image():
-    url = "https://image.shutterstock.com/image-photo/medical-background-with-flat-design-260nw-1213842439.jpg"
-    response = requests.get(url)
-    return Image.open(BytesIO(response.content))
 
 # Function to calculate estimated HbA1c based on average blood glucose level
 def calculate_hba1c(avg_glucose):
@@ -17,90 +8,50 @@ def calculate_hba1c(avg_glucose):
 # Function to provide health advice based on glucose levels
 def provide_health_advice(glucose):
     if glucose < 70:
-        return "🛑 **Hypoglycemia Warning:** Your blood glucose is too low. Eat something sugary immediately."
+        return "⚠️ Your blood glucose is too low (hypoglycemia). Consider eating something sugary."
     elif 70 <= glucose <= 99:
-        return "✅ **Normal Range:** Your blood glucose is within a healthy range."
+        return "✅ Your blood glucose is in the normal range. Keep it up!"
     elif 100 <= glucose <= 125:
-        return "⚠️ **Prediabetic Range:** Your blood glucose indicates prediabetes. Consider consulting a healthcare professional."
+        return "⚠️ You are in the prediabetic range. Consider consulting a doctor."
     else:
-        return "🛑 **Hyperglycemia Alert:** Your blood glucose is too high. Seek medical attention if it remains elevated."
-
-# Custom CSS for a clean medical-themed design
-def custom_css():
-    st.markdown("""
-        <style>
-            .main {
-                background-color: #f7f9fc;
-            }
-            .sidebar .sidebar-content {
-                background-color: #f0f4f7;
-            }
-            .stButton>button {
-                background-color: #007acc;
-                color: white;
-                border-radius: 10px;
-                font-size: 16px;
-                padding: 8px 16px;
-            }
-            .stButton>button:hover {
-                background-color: #005f99;
-                color: white;
-            }
-            h1, h2, h3 {
-                color: #004b70;
-            }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                background-color: #004b70;
-                color: white;
-                text-align: center;
-                padding: 10px;
-            }
-        </style>
-        """, unsafe_allow_html=True)
+        return "⚠️ Your blood glucose is high (hyperglycemia). Seek medical advice."
 
 # Streamlit app layout
 def main():
-    custom_css()  # Apply the custom CSS for the medical theme
-    
-    # Sidebar with medical-themed design
-    st.sidebar.title("🔬 Medical Health App")
-    st.sidebar.write("Use this app to track your blood glucose and get medical advice.")
+    # Customizing the sidebar
+    st.sidebar.title("Blood Glucose & HbA1c App")
+    st.sidebar.write("Use this app to track your glucose levels and get insights on your health.")
 
-    # Title and description
+    # Main title and description
     st.title("🩸 Blood Glucose & HbA1c Estimator")
-    st.subheader("Monitor your blood glucose levels and estimate your HbA1c for a healthier life.")
+    st.write("This app helps you track your **blood glucose levels**, provides **health advice**, and calculates your **estimated HbA1c**.")
+    
+    # Adding some visual elements
+    st.image("https://images.unsplash.com/photo-1574169208507-843761748bbf", caption="Monitor your blood glucose", use_column_width=True)
+    
+    # User input for glucose levels
+    glucose = st.slider("Select your blood glucose level (mg/dL):", min_value=0, max_value=400, value=100)
 
-    # Display medical-themed image (from an online source)
-    image = load_medical_image()
-    st.image(image, use_column_width=True, caption="Track your blood glucose for better health.")
+    # Calculate HbA1c based on the average glucose level
+    avg_glucose = st.slider("Select your average blood glucose level (mg/dL):", min_value=0, max_value=400, value=100)
 
-    # User input for glucose levels with sliders
-    glucose = st.slider("Select your current blood glucose level (mg/dL):", min_value=50, max_value=400, value=100, step=1)
-    avg_glucose = st.slider("Select your average blood glucose level over the last 90 days (mg/dL):", min_value=50, max_value=400, value=120, step=1)
-
-    # Get Health Advice button
+    # Buttons for interactivity
     if st.button("Get Health Advice"):
         advice = provide_health_advice(glucose)
-        st.info(advice)
+        st.write(advice)
 
-    # Calculate Estimated HbA1c button
     if st.button("Calculate Estimated HbA1c"):
         estimated_hba1c = calculate_hba1c(avg_glucose)
         st.success(f"Your estimated HbA1c is: **{estimated_hba1c:.2f}%**")
         
-        # Display informative chart for the user's glucose level
+        # Display an informative chart
         fig, ax = plt.subplots()
-        ax.bar(['Your Glucose Level'], [glucose], color='#4db8ff')
+        ax.bar(['Glucose Level'], [glucose], color='lightblue')
         ax.set_ylim(0, 400)
-        ax.set_ylabel('mg/dL')
-        ax.set_title("Your Current Glucose Level")
         st.pyplot(fig)
 
-    # Footer
-    st.markdown("<div class='footer'>Made with ❤️ by [Your Name] | Powered by Streamlit</div>", unsafe_allow_html=True)
+    # Adding footer
+    st.sidebar.write("Made with ❤️ using Streamlit")
 
 if __name__ == "__main__":
     main()
